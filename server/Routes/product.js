@@ -17,7 +17,7 @@ const { upload } = require('../Middleware/upload')
 router.get('/product', list) //**สามารถใส่ middleware ('/endpoint',middleware,list) เพื่อใช้ในการตรวจสอบ token ก่อนได้**
 router.get('/product/:id', read)
 router.post('/product',upload, create) //middlewware
-router.put('/product/:id', update)
+router.put('/product/:id',upload, update)
 router.delete('/product/:id', remove)
 
 

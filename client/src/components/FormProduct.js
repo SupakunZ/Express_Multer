@@ -20,14 +20,15 @@ const FormProduct = () => {
     useEffect(() => {
         // code
         loadData()
-
     }, [])
+    console.log(process.env.REACT_APP_API)
 
     const loadData = async () => {
         getdata()
             .then((res) => setData(res.data))
             .catch((err) => console.log(err))
     }
+    
     const handleChange = (e) => {
         // console.log(e.target.files) //ค่าของไฟล์ที่อัพโหลด
 
@@ -43,29 +44,38 @@ const FormProduct = () => {
             })
         }
     }
+    
     const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(form)
-        // create(form)
-        //     .then(res => {
-        //         console.log(res.data)
-        //         loadData()
-        //     })
-        //     .catch((err) => console.log(err))
-    }
-    const handleRemove = async (id) => {
-        remove(id)
-            .then((res) => {
-                console.log(res)
-                loadData()
-            })
-            .catch((err) => console.log(err))
-    }
-    return (
+        // console.log(form)
+        //**ก่อนที่จะส่งต้องส่ง form เป็น multipart/form-data */
+        const formWithImageData = new FormData()
+        for (const key in form) { //ใช้ for in ในการ loop object ให้อยู่ในรูป  multipart/form-data
+            formWithImageData.append(key,form[key]) //append { key:value } เพิ่ม key:value ลงใน object
+            }
+            console.log(formWithImageData) //ไม่แสดงเพราะเป็นแบบ multipart/form-data
+            create(formWithImageData)
+                .then(res => {
+                    console.log(res.data)
+                    loadData()
+                })
+                .catch((err) => console.log(err))
+        }
+        
+        const handleRemove = async (id) => {
+            remove(id)
+                .then((res) => {
+                    console.log(res)
+                    loadData()
+                })
+                .catch((err) => console.log(err))
+        }
+    
+        return (
         <div>
             {/* HTML */}
             FormProduct
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} encType="multipart/form-data"> {/*ต้องกำหนดให้ส่งเป็น multipart/form-data */}
                 <input
                     type='text'
                     name='name'
@@ -83,6 +93,7 @@ const FormProduct = () => {
                     type='text'
                     name='price'
                     placeholder='price'
+                    onChange={e => handleChange(e)}
                  />
                 <br />
                 <input
@@ -95,12 +106,13 @@ const FormProduct = () => {
             <table className="table">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">name</th>
-                        <th scope="col">detail</th>
-                        <th scope="col">price</th>
-                        <th scope="col">action</th>
-                        <th scope="col">edit</th>
+                        <th scope="col">No</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Detail</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -110,6 +122,7 @@ const FormProduct = () => {
                                 <td>{index + 1}</td>
                                 <td>{item.name}</td>
                                 <td>{item.detail}</td>
+                                <td><img src={`${process.env.REACT_APP_API}uploads/${item.file}`} alt="test" width="60" height="60"/></td>
                                 <td>{item.price}</td>
                                 <td onClick={() => handleRemove(item._id)}>
                                     delete
@@ -125,8 +138,6 @@ const FormProduct = () => {
                     }
                 </tbody>
             </table>
-
-
         </div>
     )
 }

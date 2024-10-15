@@ -51,8 +51,24 @@ exports.update = async (req, res) => {
     try {
         // code
         const id = req.params.id
+        var newData = req.body
+        // console.log(req.body)
+        // console.log(req.file)
+        //ตรวจสอบว่ามีรูปส่งมาไหม
+        if (typeof req.file != 'undefined') {
+            //1.เพิ่ม ชื่อไฟล์ไหมลงใน form ที่ส่งมา
+            newData.file = req.file.filename 
+            //2.ลบรูปเดิมออก
+            await fs.unlink('./uploads/'+newData.fileold,(err) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log('Edit success')
+                }
+            })
+        }
         const updated = await Product
-            .findOneAndUpdate({ _id: id }, req.body, { new: true })
+            .findOneAndUpdate({ _id: id }, newData, { new: true })
             .exec()
         res.send(updated)
 
